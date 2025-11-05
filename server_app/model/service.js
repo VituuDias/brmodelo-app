@@ -24,13 +24,13 @@ const getById = async (modelId, userId) => {
 	return new Promise(async (resolve, reject) => {
 		try {
 			const model = await modelRepository.findOne({ _id: modelId });
-			if(model == null) {
-				const notFoundErr =  new Error('model not found');
+			if (model == null) {
+				const notFoundErr = new Error('model not found');
 				notFoundErr.status = 404;
 				throw notFoundErr;
 			}
-			if(model != null && model.who != userId) {
-				const notAuthotizedErr =  new Error('user not authorired');
+			if (model != null && model.who != userId) {
+				const notAuthotizedErr = new Error('user not authorired');
 				notAuthotizedErr.status = 401;
 				throw notAuthotizedErr;
 			}
@@ -100,7 +100,7 @@ const remove = async (modelId) => {
 	return new Promise(async (resolve, reject) => {
 		try {
 			const result = await modelRepository.deleteOne({ _id: modelId });
-			if(result != null) {
+			if (result != null) {
 				return resolve("ok");
 			}
 			return reject();
@@ -124,8 +124,8 @@ const toggleShare = async (modelId, active, importAllowed) => {
 	return new Promise(async (resolve, reject) => {
 		try {
 			const model = await modelRepository.findOne({ _id: modelId });
-			if(model != null) {
-				const shareOptions = model.shareOptions != null ? model.shareOptions : {"active": false, "importAllowed": false}
+			if (model != null) {
+				const shareOptions = model.shareOptions != null ? model.shareOptions : { "active": false, "importAllowed": false }
 				shareOptions.active = active;
 				shareOptions.importAllowed = importAllowed;
 				const updatedModel = await modelRepository.findOneAndUpdate(
@@ -133,7 +133,7 @@ const toggleShare = async (modelId, active, importAllowed) => {
 					{ $set: { shareOptions: shareOptions, updated: Date.now() } },
 					{ new: true }
 				);
-				if(updatedModel != null) {
+				if (updatedModel != null) {
 					return resolve(buildConfigResponse(updatedModel.shareOptions));
 				}
 				return reject();
@@ -149,10 +149,10 @@ const findShareOptions = async (modelId) => {
 	return new Promise(async (resolve, reject) => {
 		try {
 			const model = await modelRepository.findOne({ _id: modelId });
-			if(model != null && model.shareOptions != null) {
+			if (model != null && model.shareOptions != null) {
 				return resolve(buildConfigResponse(model.shareOptions));
 			}
-			const shareOptions = {"active": false, "importAllowed": false};
+			const shareOptions = { "active": false, "importAllowed": false };
 			const updatedModel = await modelRepository.findOneAndUpdate(
 				{ _id: modelId },
 				{ $set: { shareOptions: shareOptions, updated: Date.now() } },
@@ -170,7 +170,7 @@ const findSharedModel = async (sharedId) => {
 	return new Promise(async (resolve, reject) => {
 		try {
 			const model = await modelRepository.findOne({ "shareOptions._id": sharedId });
-			if(model === null || model.shareOptions === null || !model.shareOptions.active){
+			if (model === null || model.shareOptions === null || !model.shareOptions.active) {
 				reject("unauthorized");
 			}
 			return resolve({
@@ -204,7 +204,7 @@ const importModel = async (sharedId, userId) => {
 		try {
 			const sharedModel = await findSharedModel(sharedId);
 
-			if(!sharedModel.importAllowed){
+			if (!sharedModel.importAllowed) {
 				return reject("unauthorized");
 			}
 
